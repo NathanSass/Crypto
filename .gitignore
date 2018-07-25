@@ -1,0 +1,49 @@
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+proguard/
+R.java
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# vi swap files
+*.swp
+
+# emacs
+*~
+
+# android studio / intellij stuff
+.idea/
+*/build/*
+/build
+.gradle/
+*.iml
+
+# osx stuff
+.DS_Store
+
+.metadata
+
+# Generated as a side effect of 'android update project' in build scripts, but not used by the IDE
+project.properties
+proguard-project.txt
+build.xml
+
+# layout inspector
+/captures
+
+# VS code
+.vscode
+**/.project
+**/.settings
