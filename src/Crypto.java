@@ -13,27 +13,23 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 
-class Cryptor {
-
+public class Crypto {
     private Cipher cipher;
-    private String secretKey = "1234567890qwertz";
-    private String iv = "1234567890qwertz";
-//    private final String CIPHER_MODE = "AES/CTR/NoPadding";
     private final String CIPHER_MODE = "AES/CFB8/NoPadding";
 
     private SecretKey keySpec;
     private IvParameterSpec ivSpec;
     private Charset CHARSET = Charset.forName("UTF8");
 
-    public Cryptor(){
-
+    public Crypto(){
+        String secretKey = "1234567890qwertz";
         keySpec = new SecretKeySpec(secretKey.getBytes(CHARSET), "AES");
+
+        String iv = "1234567890qwertz";
         ivSpec = new IvParameterSpec(iv.getBytes(CHARSET));
         try {
             cipher = Cipher.getInstance(CIPHER_MODE);
-        } catch (NoSuchAlgorithmException e) {
-            throw new SecurityException(e);
-        } catch (NoSuchPaddingException e) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new SecurityException(e);
         }
     }
@@ -43,24 +39,17 @@ class Cryptor {
      * @return The decrypted String
      */
     public String decrypt(String input) {
-
         try {
             cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
             return  new String(cipher.doFinal(DatatypeConverter.parseBase64Binary(input)));
-        } catch (IllegalBlockSizeException e) {
-            throw new SecurityException(e);
-        } catch (BadPaddingException e) {
-            throw new SecurityException(e);
-        } catch (InvalidKeyException e) {
-            throw new SecurityException(e);
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new SecurityException(e);
         }
     }
 
     /**
      * @param input Any String to be encrypted
-     * @return An "AES/CFB8/NoPadding" encrypted String
+     * @return An encrypted String
      */
     public String encrypt(String input) {
         try {
@@ -72,7 +61,7 @@ class Cryptor {
     }
 
     /**
-     * Encrypts the keys and values of a JSONObject with Cryptor.encrypt(String input)
+     * Encrypts the keys and values of a JSONObject with Crypto.encrypt(String input)
      * @param o The JSONObject to be encrypted
      * @return A JSONObject with encrypted keys and values
      */
@@ -89,7 +78,7 @@ class Cryptor {
     }
 
     /**
-     * Decrypts the keys and values of a JSONObject with Cryptor.decrypt(String input)
+     * Decrypts the keys and values of a JSONObject with Crypto.decrypt(String input)
      * @param o The JSONObject to be decrypted
      * @return A JSONObject with decrypted keys and values
      */
@@ -112,15 +101,11 @@ class Cryptor {
      * @param a The JSONArray to be encrypted
      * @return A JSONArray with encrypted keys and values
      */
-    public JSONArray jsonArrayEncrypt(JSONArray a) {
+    public JSONArray jsonArrayEncrypt(JSONArray a) throws JSONException {
         JSONArray returnArray = new JSONArray();
 
         for(int i = 0; i < a.length(); i++) {
-            try {
-                returnArray.put(this.jsonObjectEncrypt((JSONObject)a.get(i)));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            returnArray.put(this.jsonObjectEncrypt((JSONObject)a.get(i)));
         }
 
         return returnArray;
@@ -131,15 +116,11 @@ class Cryptor {
      * @param a The JSONArray to be decrypted
      * @return A JSONArray with decrypted keys and values
      */
-    public JSONArray jsonArrayDecrypt(JSONArray a) {
+    public JSONArray jsonArrayDecrypt(JSONArray a) throws JSONException {
         JSONArray returnArray = new JSONArray();
 
         for(int i = 0; i < a.length(); i++) {
-            try {
-                returnArray.put(this.jsonObjectDecrypt((JSONObject)a.get(i)));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            returnArray.put(this.jsonObjectDecrypt((JSONObject)a.get(i)));
         }
 
         return returnArray;
@@ -149,7 +130,8 @@ class Cryptor {
 
         try {
 
-            Cryptor c = new Cryptor();
+            Crypto c = new Crypto();
+
             String original = "MiiiMüäöMeeʞ";
             System.out.println("Original: " + original);
             String encrypted = c.encrypt(original);
@@ -158,10 +140,10 @@ class Cryptor {
 
             JSONArray arr = new JSONArray("[{\"id\"=\" 1 ʞ3 \"},{\"id\"=\"4\"}]");
             System.out.println(c.jsonArrayDecrypt(c.jsonArrayEncrypt(arr)).getJSONObject(0).getString("id"));
+            System.out.println(c.jsonArrayDecrypt(c.jsonArrayEncrypt(arr)).getJSONObject(1).getString("id"));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-
     }
 }
